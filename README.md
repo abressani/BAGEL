@@ -1,3 +1,5 @@
+BAGEL: Bayesian Analysis of Galactic Environments with machine Learning
+
 # Daneel — Computational Astrophysics 2026–27
 
 A teaching package for modelling exoplanet transits and building detection
