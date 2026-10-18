@@ -1,6 +1,13 @@
+----ASSIGNMENT 1
+----TASK B
 #### assignment1_taskB.txt
 Hash: 441bb7760c2bb168c7c8882fdf040a7cd1b26a88
 Date: 2026-10-16 10:08:41 +0200
 #### assignment1_taskB_L.txt
 Hash: 3220ec94ade6264119a80dfcbfb6bdd7c9288845
 Date: 2026-10-18 20:42:20 +0200
+
+----TASK C
+## Letizia
+Hash: fece29da88cb2f4244e024b3b4844f70254b1ba7
+Date: 2026-10-18 22:59:01 +0200
