@@ -11,3 +11,16 @@ Date: 2026-10-18 20:42:20 +0200
 ## Letizia
 Hash: fece29da88cb2f4244e024b3b4844f70254b1ba7
 Date: 2026-10-18 22:59:01 +0200
+## Alessandro
+Hash: 3bc801b6902e385df6e1094ed4b4568d6465ca2e
+Date: 2026-10-23 09:32:45 +0200
+## Peijia
+Hash: fc02de24c525ee9df464df7ddf417688455495a2
+Date: 2026-10-27 14:52:50 +0100
+----TASK E
+Hash: bc5d0c0475a58fa3bcd7f02afd2924558be8d7d5
+Code: 2026-10-23 10:01:05 +0200
+
+
+----TASK I
+BAGEL = Bayesian Analysis of Galactic Environments using machine Learning
