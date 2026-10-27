@@ -171,3 +171,6 @@ cython_debug/
 .idea/
 .vscode/
 .DS_Store
+
+# GalaxyMNIST dataset (downloaded locally, do not commit)
+data/

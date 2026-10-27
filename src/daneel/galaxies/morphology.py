@@ -58,12 +58,18 @@ def _load_one_galaxy(data_root: str | Path, split: str, index: int):
     # The Hugging Face mirror reuses the cache populated by the notebook.
     try:
         from datasets import load_dataset
+    except ImportError as exc:
+        raise ImportError(
+            "Cannot import 'datasets'. Install it in the Python environment "
+            "used to run this script: python -m pip install datasets"
+        ) from exc
+
+    try:
         from PIL import Image
     except ImportError as exc:
         raise ImportError(
-            "Real GalaxyMNIST loading needs 'datasets' and 'Pillow'. "
-            "Activate the ca26bagel environment and install them with "
-            "`python -m pip install datasets pillow`."
+            "Cannot import 'Pillow'. Install it in the Python environment "
+            "used to run this script: python -m pip install pillow"
         ) from exc
 
     dataset = load_dataset(HF_DATASET_ID, split=split)
