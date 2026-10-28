@@ -2,8 +2,7 @@ BAGEL: Bayesian Analysis of Galactic Environments with machine Learning
 
 # Daneel — Computational Astrophysics 2026–27
 
-A teaching package for modelling exoplanet transits and building detection
-pipelines. The repository contains the course example code, a runnable CLI,
+A teaching package for modelling galaxy morphology classification (GalaxyMNIST) and Baryonic Tully–Fisher Relation (BTFR) analysis (SPARC/BayesLineFit and dynesty). The repository contains the course example code, a runnable CLI,
 and Sphinx documentation.
 
 Documentation: <https://tiziano1590.github.io/comp_astro_26/>.
@@ -35,6 +34,7 @@ After installation, you can run daneel from the command line:
 ```bash
 daneel -i <input_file> --transit [--output lightcurve.png]
 daneel -i <input_file> --galaxy [--output galaxy.png]
+daneel -i <input_file> --galaxy [--index N] [--output galaxy.png]
 ```
 
 ### Command-line options
@@ -46,6 +46,7 @@ daneel -i <input_file> --galaxy [--output galaxy.png]
 - `-d, --detect`: Reserved for the course detection exercise
 - `-a, --atmosphere`: Reserved for the course atmosphere exercise
 - `-o, --output`: Output path for the transit plot (default: `lc.png`)
+- `--index`: Zero-based index of the galaxy to plot with `--galaxy` (default: 7). Valid range: 0–7999 for the train split
 
 ### Examples
 
@@ -64,6 +65,8 @@ daneel -i examples/params.yaml --atmosphere
 ```bash
 daneel -i examples/params.yaml --galaxy --output galaxy.png
 ```
+# Plot a different galaxy
+daneel -i examples/params.yaml --galaxy --index <galaxy_index> --output galaxy_<galaxy_index>.png
 
 Plots one real GalaxyMNIST galaxy (currently train split, index 7) with its class
 and azimuthally averaged radial brightness profile. The official GalaxyMNIST download
