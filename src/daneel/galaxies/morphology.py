@@ -171,7 +171,7 @@ def main():
     parser = argparse.ArgumentParser(description="Plot a real GalaxyMNIST galaxy and radial profile.")
     parser.add_argument("--data-root", default="data", help="Dataset root (default: ./data)")
     parser.add_argument("--split", choices=("train", "test"), default="train")
-    parser.add_argument("--index", type=int, default=10, help="Zero-based galaxy index")
+    parser.add_argument("--index", type=int, default=6401, help="Zero-based galaxy index")
     parser.add_argument("--output", default=None, help="Output PNG path")
     args = parser.parse_args()
     result = plot_galaxy(

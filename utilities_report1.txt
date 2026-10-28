@@ -19,13 +19,18 @@ Hash: fc02de24c525ee9df464df7ddf417688455495a2
 Date: 2026-10-27 14:52:50 +0100
 
 ---TASK D
-Method: Merged while keeping the branch present
+Method: Used 'merge' while keeping the branch present
 Hash: ab823c486e78f0cd753e23652c07870d46297c45
 Date: 2026-10-27 15:09:54 +0100
 
 ----TASK E
 Hash: bc5d0c0475a58fa3bcd7f02afd2924558be8d7d5
 Code: 2026-10-23 10:01:05 +0200
+
+----TASK F
+Description: morphology.py uses Hugging face to download the galaxy if not already downloaded (data not available on PyTorch), then displays morpho type, rgb image, and radial brightness profile. init imports the functions within morphology
+Hash: 
+Date:
 
 
 ----TASK I
