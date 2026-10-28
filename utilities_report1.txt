@@ -29,8 +29,8 @@ Code: 2026-10-23 10:01:05 +0200
 
 ----TASK F
 Description: morphology.py uses Hugging face to download the galaxy if not already downloaded (data not available on PyTorch), then displays morpho type, rgb image, and radial brightness profile. init imports the functions within morphology
-Hash: 
-Date:
+Hash: f4f3b70138821f2c98f529df7314528a2ce108a6
+Date: 2026-10-28 14:32:22 +0100
 
 
 ----TASK I
