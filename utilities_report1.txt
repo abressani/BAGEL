@@ -32,6 +32,10 @@ Description: morphology.py uses Hugging face to download the galaxy if not alrea
 Hash: f4f3b70138821f2c98f529df7314528a2ce108a6
 Date: 2026-10-28 14:32:22 +0100
 
+----TASK G
+Hash: 39dabf7eeadc1dc16584e3f6c64fc43532e8a6e6  
+Date: 2026-10-28 15:13:02 +0100
+
 
 ----TASK I
 BAGEL = Bayesian Analysis of Galactic Environments using machine Learning
