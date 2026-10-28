@@ -22,7 +22,18 @@ def main():
 
     actions.add_argument("-d", "--detect", action="store_true", help="Run exoplanet detection")
     actions.add_argument("-a", "--atmosphere", action="store_true", help="Run atmospheric characterisation")
-    parser.add_argument("-o", "--output", default="lc.png", help="Output image for --transit")
+    actions.add_argument(
+        "-g",
+        "--galaxy",
+        action="store_true",
+        help="Plot a GalaxyMNIST galaxy and its radial brightness profile",
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        default=None,
+        help="Output image for --transit (default: lc.png) or --galaxy (default: galaxy.png)",
+    )
 
     args = parser.parse_args()
 
@@ -33,7 +44,21 @@ def main():
 
     if args.transit:
         transit = TransitModel(input_pars['transit'])
-        transit.plot_light_curve(args.output)
+        transit.plot_light_curve(args.output or "lc.png")
+    elif args.galaxy:
+        # Imported here so that the galaxy dependencies (h5py, datasets, ...)
+        # are only needed when --galaxy is used.
+        from daneel.galaxies import plot_galaxy
+
+        result = plot_galaxy(
+            data_root="data",
+            split="train",
+            index=7,
+            output_path=args.output or "galaxy.png",
+            show=False,
+        )
+        print(f"Galaxy {result['index']} ({result['split']}): {result['class_name']}")
+        print(f"Saved: {result['output_path']}")
     elif args.detect:
         parser.error("detection is not implemented yet; use --transit")
     elif args.atmosphere:
