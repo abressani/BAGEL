@@ -35,6 +35,13 @@ def main():
         help="Output image for --transit (default: lc.png) or --galaxy (default: galaxy.png)",
     )
 
+    parser.add_argument(
+        "--index",
+        type=int,
+        default=7,
+        help="GalaxyMNIST image index (default: 7)",
+    )
+
     args = parser.parse_args()
 
     """Launch Daneel"""
@@ -53,7 +60,7 @@ def main():
         result = plot_galaxy(
             data_root="data",
             split="train",
-            index=7,
+            index=args.index,
             output_path=args.output or "galaxy.png",
             show=False,
         )
