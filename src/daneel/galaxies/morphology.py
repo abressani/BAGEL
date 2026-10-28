@@ -58,18 +58,12 @@ def _load_one_galaxy(data_root: str | Path, split: str, index: int):
     # The Hugging Face mirror reuses the cache populated by the notebook.
     try:
         from datasets import load_dataset
-    except ImportError as exc:
-        raise ImportError(
-            "Cannot import 'datasets'. Install it in the Python environment "
-            "used to run this script: python -m pip install datasets"
-        ) from exc
-
-    try:
         from PIL import Image
     except ImportError as exc:
         raise ImportError(
-            "Cannot import 'Pillow'. Install it in the Python environment "
-            "used to run this script: python -m pip install pillow"
+            "Real GalaxyMNIST loading needs 'datasets' and 'Pillow'. "
+            "Activate the ca26bagel environment and install them with "
+            "`python -m pip install datasets pillow`."
         ) from exc
 
     dataset = load_dataset(HF_DATASET_ID, split=split)
@@ -123,9 +117,9 @@ def azimuthal_mean_profile(image: np.ndarray):
 def plot_galaxy(
     data_root: str | Path = "data",
     split: str = "train",
-    index: int = 7,
+    index: int = 10,
     output_path: str | Path | None = None,
-    show: bool = True,
+    show: bool = False,
 ):
     """Plot one real GalaxyMNIST image and its radial brightness profile.
 
@@ -177,7 +171,7 @@ def main():
     parser = argparse.ArgumentParser(description="Plot a real GalaxyMNIST galaxy and radial profile.")
     parser.add_argument("--data-root", default="data", help="Dataset root (default: ./data)")
     parser.add_argument("--split", choices=("train", "test"), default="train")
-    parser.add_argument("--index", type=int, default=7, help="Zero-based galaxy index")
+    parser.add_argument("--index", type=int, default=10, help="Zero-based galaxy index")
     parser.add_argument("--output", default=None, help="Output PNG path")
     args = parser.parse_args()
     result = plot_galaxy(
