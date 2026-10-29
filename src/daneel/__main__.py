@@ -1,5 +1,6 @@
 import argparse
 from datetime import datetime, timezone
+from pathlib import Path
 
 from daneel.detection import TransitModel
 from daneel.parameters import Parameters
@@ -19,27 +20,20 @@ def main():
 
     actions = parser.add_mutually_exclusive_group(required=True)
     actions.add_argument("-t", "--transit", action="store_true", help="Plot a transit light curve")
-
     actions.add_argument("-d", "--detect", action="store_true", help="Run exoplanet detection")
     actions.add_argument("-a", "--atmosphere", action="store_true", help="Run atmospheric characterisation")
     actions.add_argument(
         "-g",
         "--galaxy",
         action="store_true",
-        help="Plot a GalaxyMNIST galaxy and its radial brightness profile",
+        help="Plot a GalaxyMNIST galaxy and its radial brightness profile "
+        "(data_root, split and index are read from the 'galaxy' section of the input file)",
     )
     parser.add_argument(
         "-o",
         "--output",
         default=None,
         help="Output image for --transit (default: lc.png) or --galaxy (default: galaxy.png)",
-    )
-
-    parser.add_argument(
-        "--index",
-        type=int,
-        default=7,
-        help="GalaxyMNIST image index (default: 7)",
     )
 
     args = parser.parse_args()
@@ -57,10 +51,22 @@ def main():
         # are only needed when --galaxy is used.
         from daneel.galaxies import plot_galaxy
 
+        galaxy_pars = input_pars.get("galaxy")
+        if not isinstance(galaxy_pars, dict):
+            parser.error("input file must contain a 'galaxy' section")
+
+        missing = [k for k in ("data_root", "index") if galaxy_pars.get(k) is None]
+        if missing:
+            parser.error(f"'galaxy' section is missing: {', '.join(missing)}")
+
+        data_root = Path(galaxy_pars["data_root"]).expanduser()
+        if not data_root.is_absolute():
+            parser.error("galaxy.data_root must be an absolute path")
+
         result = plot_galaxy(
-            data_root="data",
-            split="train",
-            index=args.index,
+            data_root=data_root,
+            split=galaxy_pars.get("split", "train"),
+            index=int(galaxy_pars["index"]),
             output_path=args.output or "galaxy.png",
             show=False,
         )

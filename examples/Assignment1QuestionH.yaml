@@ -1,0 +1,4 @@
+galaxy:
+  data_root: /absolute/path/to/data
+  split: train
+  index: 6401
