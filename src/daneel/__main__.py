@@ -22,11 +22,7 @@ def main():
     actions.add_argument("-t", "--transit", action="store_true", help="Plot a transit light curve")
     actions.add_argument("-d", "--detect", action="store_true", help="Run exoplanet detection")
     actions.add_argument("-a", "--atmosphere", action="store_true", help="Run atmospheric characterisation")
-    actions.add_argument(
-        "-g",
-        "--galaxy",
-        action="store_true",
-        help="Plot a GalaxyMNIST galaxy and its radial brightness profile "
+    actions.add_argument("-g", "--galaxy", action="store_true", help="Plot a GalaxyMNIST galaxy and its radial brightness profile "
         "(data_root, split and index are read from the 'galaxy' section of the input file)",
     )
     parser.add_argument(
@@ -34,6 +30,10 @@ def main():
         "--output",
         default=None,
         help="Output image for --transit (default: lc.png) or --galaxy (default: galaxy.png)",
+    )
+    parser.add_argument("-idx", "--index", type=int, default=None,
+        help="GalaxyMNIST image index; only used with --galaxy when the "
+        "input file's 'galaxy' section has no 'index'",
     )
 
     args = parser.parse_args()
@@ -46,18 +46,25 @@ def main():
     if args.transit:
         transit = TransitModel(input_pars['transit'])
         transit.plot_light_curve(args.output or "lc.png")
+
     elif args.galaxy:
-        # Imported here so that the galaxy dependencies (h5py, datasets, ...)
-        # are only needed when --galaxy is used.
         from daneel.galaxies import plot_galaxy
 
         galaxy_pars = input_pars.get("galaxy")
         if not isinstance(galaxy_pars, dict):
             parser.error("input file must contain a 'galaxy' section")
 
-        missing = [k for k in ("data_root", "index") if galaxy_pars.get(k) is None]
-        if missing:
-            parser.error(f"'galaxy' section is missing: {', '.join(missing)}")
+        if galaxy_pars.get("data_root") is None:
+            parser.error("'galaxy' section is missing: data_root")
+
+        # The YAML takes priority; --index is only a fallback.
+        index = galaxy_pars.get("index")
+        if index is None:
+            index = args.index
+        elif args.index is not None:
+            print(f"Warning: using index {index} from the input file; ignoring --index {args.index}")
+        if index is None:
+            parser.error("no galaxy index given: set 'index' in the 'galaxy' section or pass --index")
 
         data_root = Path(galaxy_pars["data_root"]).expanduser()
         if not data_root.is_absolute():
@@ -66,12 +73,13 @@ def main():
         result = plot_galaxy(
             data_root=data_root,
             split=galaxy_pars.get("split", "train"),
-            index=int(galaxy_pars["index"]),
+            index=int(index),
             output_path=args.output or "galaxy.png",
             show=False,
         )
         print(f"Galaxy {result['index']} ({result['split']}): {result['class_name']}")
         print(f"Saved: {result['output_path']}")
+
     elif args.detect:
         parser.error("detection is not implemented yet; use --transit")
     elif args.atmosphere:
