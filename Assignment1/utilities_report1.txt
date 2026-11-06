@@ -1,0 +1,41 @@
+----ASSIGNMENT 1
+----TASK B
+#### assignment1_taskB.txt
+Hash: 441bb7760c2bb168c7c8882fdf040a7cd1b26a88
+Date: 2026-10-16 10:08:41 +0200
+#### assignment1_taskB_L.txt
+Hash: 3220ec94ade6264119a80dfcbfb6bdd7c9288845
+Date: 2026-10-18 20:42:20 +0200
+
+----TASK C
+## Letizia
+Hash: fece29da88cb2f4244e024b3b4844f70254b1ba7
+Date: 2026-10-18 22:59:01 +0200
+## Alessandro
+Hash: 3bc801b6902e385df6e1094ed4b4568d6465ca2e
+Date: 2026-10-23 09:32:45 +0200
+## Peijia
+Hash: fc02de24c525ee9df464df7ddf417688455495a2
+Date: 2026-10-27 14:52:50 +0100
+
+---TASK D
+Method: Used 'merge' while keeping the branch present
+Hash: ab823c486e78f0cd753e23652c07870d46297c45
+Date: 2026-10-27 15:09:54 +0100
+
+----TASK E
+Hash: bc5d0c0475a58fa3bcd7f02afd2924558be8d7d5
+Code: 2026-10-23 10:01:05 +0200
+
+----TASK F
+Description: morphology.py uses Hugging face to download the galaxy if not already downloaded (data not available on PyTorch), then displays morpho type, rgb image, and radial brightness profile. init imports the functions within morphology
+Hash: f4f3b70138821f2c98f529df7314528a2ce108a6
+Date: 2026-10-28 14:32:22 +0100
+
+----TASK G
+Hash: 39dabf7eeadc1dc16584e3f6c64fc43532e8a6e6  
+Date: 2026-10-28 15:13:02 +0100
+
+
+----TASK I
+BAGEL = Bayesian Analysis of Galactic Environments using machine Learning
