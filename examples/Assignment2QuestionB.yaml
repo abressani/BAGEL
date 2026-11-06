@@ -1,0 +1,4 @@
+galaxy:
+  data_root: C:/Users/magri/Desktop/ca2627/local_BAGEL/data/
+  split: train
+  index: 27
