@@ -1,0 +1,3 @@
+There's a degeneracy between the surface brightness fall off and size of the galaxy. For example, a small edge-on disk has a similar profile as a large smooth cigar. By collapsing to 1D, we introduce this degeneracy.
+
+Our example shows two similarly sized galaxies from different classes. The slopes have a similar fall-off, making it difficult to distinguish them from radial profile alone. The plots have the same normalization, radial binning, and spatial scale.

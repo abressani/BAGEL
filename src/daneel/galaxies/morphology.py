@@ -14,10 +14,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 CLASS_NAMES = (
-    "smooth_round",
-    "smooth_cigar",
-    "edge_on_disk",
-    "unbarred_spiral",
+    "smooth_round", # flat fall-off
+    "smooth_cigar", # steep fall-off
+    "edge_on_disk", # steep fall-off
+    "unbarred_spiral", 
 )
 HF_DATASET_ID = "matthieulel/galaxy_mnist"
 IMAGE_SIZE = (64, 64)
