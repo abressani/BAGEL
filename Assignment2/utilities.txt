@@ -1,1 +1,10 @@
-Task A)
+Task A: Date:
+	Hash:
+
+Task B: There's a degeneracy between the surface brightness fall off and 
+	size of the galaxy. For example, a small edge-on disk has a
+	similar profile as a large smooth cigar. By collapsing to 1D, we
+	introduce this degeneracy.
+	
+	Date:
+	Hash:
