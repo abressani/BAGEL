@@ -1,9 +1,10 @@
-"""GalaxyMNIST image and azimuthally averaged radial-profile utilities.
+"""GalaxyMNIST image and azimuthally averaged radial-profile utilities using 
+the Hugging Face mirror GalaxyMNIST dataset that stores 224x224 RGB images. 
+For the Assignment 1 workflow, images are resized to 64x64 to match the original 
+dataset. 
 
-The Hugging Face mirror stores 224x224 RGB images. For the Assignment 1
-workflow, images are resized to 64x64 to match the original GalaxyMNIST
-tutorial. Real data are required; this module never generates synthetic data.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -21,6 +22,7 @@ CLASS_NAMES = (
 )
 HF_DATASET_ID = "matthieulel/galaxy_mnist"
 IMAGE_SIZE = (64, 64)
+COLORS = ("tab:blue", "tab:orange", "tab:green", "tab:red")
 
 
 def _load_one_galaxy(data_root: str | Path, split: str, index: int):
@@ -62,8 +64,7 @@ def _load_one_galaxy(data_root: str | Path, split: str, index: int):
     except ImportError as exc:
         raise ImportError(
             "Real GalaxyMNIST loading needs 'datasets' and 'Pillow'. "
-            "Activate the ca26bagel environment and install them with "
-            "`python -m pip install datasets pillow`."
+            "Install them with 'python -m pip install datasets pillow'."
         ) from exc
 
     dataset = load_dataset(HF_DATASET_ID, split=split)
