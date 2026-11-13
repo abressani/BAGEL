@@ -3,3 +3,9 @@ Task A: Date: Fri Nov 6 09:39:52 2026 +0100
 
 Task B: Date: 
 	Hash: 
+
+Task C: 
+counting how many galaxies in train set per class
+{'smooth_round': 1993, 'smooth_cigar': 1994, 'edge_on_disk': 1993, 'unbarred_spiral': 2020}
+
+

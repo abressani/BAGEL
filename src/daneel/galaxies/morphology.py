@@ -118,37 +118,74 @@ def azimuthal_mean_profile(image: np.ndarray):
 def plot_galaxy(
     data_root: str | Path = "data",
     split: str = "train",
-    index: int = 10,
+    index: int | list[int] = 10,
     output_path: str | Path | None = None,
     show: bool = False,
 ):
-    """Plot one real GalaxyMNIST image and its radial brightness profile.
+    """Plot one or more real GalaxyMNIST images and their radial brightness 
+    profiles.
 
-    Returns a dictionary containing the index, class id/name, output path,
-    image, radii and profile.
+    `index` can be a single integer or a list of integers. The figure has the
+    RGB images in the top row and in the bottom panel the radial
+    brightness profiles together fr comparison, one colour per galaxy.
+
+    Returns a dictionary with index, split, class id/name, output path and the
+    list of per-galaxy data under "galaxies"
     """
-    image, label = _load_one_galaxy(data_root, split, index)
-    if label not in range(len(CLASS_NAMES)):
-        raise ValueError(f"Unexpected GalaxyMNIST label {label}; expected 0–3.")
-    radii, profile = azimuthal_mean_profile(image)
 
+    indices = [index] if isinstance(index, int) else list(index)
+    if len(indices) == 0:
+        raise ValueError("at least one galaxy is recquired")
+
+    #load every galaxy 
+    galaxies =[]
+    for i in indices:
+        image, label = _load_one_galaxy(data_root, split, i)
+        if label not in range(len(CLASS_NAMES)):
+            raise ValueError(f"Unexpected GalaxyMNIST label {label}; expected 0–3.")
+        radii, profile = azimuthal_mean_profile(image)
+        galaxies.append({"index": i, "class_id": label, "class_name": CLASS_NAMES[label], "image": image, "radii": radii,
+                "profile": profile})
+        
     if output_path is None:
-        output_path = Path(f"galaxy_{index}_assignment1_taskF.png")
+        if len(indices) == 1:
+            output_path = Path(f"galaxy_{indices[0]}.png")
+        else:
+            output_path = Path("galaxies_comparison_" + "_".join(map(str, indices)) + ".png")
     else:
         output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    fig, (ax_image, ax_profile) = plt.subplots(1, 2, figsize=(9.3, 4.0))
-    ax_image.imshow(image)
-    ax_image.set_title(f"Galaxy {index} — {CLASS_NAMES[label]}")
-    ax_image.set_xlabel("x [pixels]")
-    ax_image.set_ylabel("y [pixels]")
+    #plots for each galaxy
 
-    ax_profile.plot(radii, profile, marker="o", markersize=2.5, linewidth=1.4)
+    n = len(galaxies)
+    fig = plt.figure(figsize=(max(6.0, 2.6*n), 9.5))
+    grid = fig.add_gridspec(2, n, height_ratios=[1, 1.2])
+
+    first_profile_ax = None
+    for k, g in enumerate(galaxies):
+        color = COLORS[k % len(COLORS)]
+
+        # images
+        ax_image = fig.add_subplot(grid[0, k])
+        ax_image.imshow(g["image"])
+        ax_image.set_title(f"{g['class_name']}\n(index {g['index']})", color=color, fontsize=10)
+        ax_image.set_xlabel("x [pixels]")
+        if k == 0:
+            ax_image.set_ylabel("y [pixels]")
+
+
+    # profiles in same plot
+    ax_profile = fig.add_subplot(grid[1, :])
+    for k, g in enumerate(galaxies):
+        ax_profile.plot(g["radii"], g["profile"], color=COLORS[k % len(COLORS)], marker="o", markersize=2.5, 
+            linewidth=1.4, label=f"{g['class_name']} (index {g['index']})")
+    
     ax_profile.set_xlabel("Radius [pixels]")
     ax_profile.set_ylabel("Mean relative intensity")
     ax_profile.set_title("Azimuthally averaged brightness")
     ax_profile.grid(alpha=0.3)
+    ax_profile.legend()
     fig.tight_layout()
     fig.savefig(output_path, dpi=170, bbox_inches="tight")
     if show:
@@ -156,34 +193,54 @@ def plot_galaxy(
     else:
         plt.close(fig)
 
+    #print statements
+    if n == 1:
+        result_index = galaxies[0]["index"]
+        result_class_id = galaxies[0]["class_id"]
+        result_class_name = galaxies[0]["class_name"]
+    else:
+        result_index = [g["index"] for g in galaxies]
+        result_class_id = [g["class_id"] for g in galaxies]
+        result_class_name = ", ".join(g["class_name"] for g in galaxies)
+
     return {
-        "index": index,
+        "index": result_index,
         "split": split,
-        "class_id": label,
-        "class_name": CLASS_NAMES[label],
+        "class_id": result_class_id,
+        "class_name": result_class_name,
         "output_path": str(output_path.resolve()),
-        "image": image,
-        "radii": radii,
-        "profile": profile,
+        "galaxies": galaxies,
+        "image": galaxies[0]["image"],
+        "radii": galaxies[0]["radii"],
+        "profile": galaxies[0]["profile"],
     }
+
+def count_galaxies_per_class(data_root: str | Path, split: str = "train"):
+    """Return a dictionary {class_name: number of galaxies} for the given split"""
+    hd5f_path = Path(data_root) / "GalaxyMNIST" / "raw" / f"{split}_dataset.hd5f"
+    if hd5f_path.is_file():
+        with h5py.File(hd5f_path, "r") as handle:
+            labels = np.asarray(handle["labels"])
+    else:
+        from datasets import load_dataset
+        labels = np.asarray(load_dataset(HF_DATASET_ID, split=split)["label"])
+
+    counts = np.bincount(labels, minlength=len(CLASS_NAMES))
+    return {name: int(c) for name, c in zip(CLASS_NAMES, counts)}
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Plot a real GalaxyMNIST galaxy and radial profile.")
+    parser = argparse.ArgumentParser(description="Plot real GalaxyMNIST galaxies and radial profiles.")
     parser.add_argument("--data-root", default="data", help="Dataset root (default: ./data)")
     parser.add_argument("--split", choices=("train", "test"), default="train")
-    parser.add_argument("--index", type=int, default=6401, help="Zero-based galaxy index")
+    parser.add_argument("--index", type=int, nargs="+", default=[6401], help="Zero-based galaxy index (one or more)")
     parser.add_argument("--output", default=None, help="Output PNG path")
     args = parser.parse_args()
-    result = plot_galaxy(
-        data_root=args.data_root,
-        split=args.split,
-        index=args.index,
-        output_path=args.output,
-    )
+    result = plot_galaxy(data_root=args.data_root, split=args.split, index=args.index, output_path=args.output)
+
     print(f"DATA SOURCE: REAL GalaxyMNIST ({result['split']})")
     print(f"Galaxy index: {result['index']}")
-    print(f"Morphological class: {result['class_name']} (label {result['class_id']})")
+    print(f"Morphological class: {result['class_name']}")
     print(f"Saved: {result['output_path']}")
 
 
