@@ -1,11 +1,28 @@
-Task A: Date: Fri Nov 6 09:39:52 2026 +0100
+Task A: Date: 2026-11-06 09:39:52 +0100
 	Hash: 1271b2a2ab25276381425bc283770fd88a66dc59
 
-Task B: Date: 
-	Hash: 
+Task B: Date: 2026-11-09 17:49:30 +0100 
+	Hash: 398d5aef42d933d0c53aca6d14f0a9a2ac046e5c 
+comparison:
 
-Task C: 
+There's a degeneracy between the surface brightness fall 
+off and size of the galaxy. For example, a small edge-on disk 
+has a similar profile as a large smooth cigar. By collapsing to 1D, 
+we introduce this degeneracy.
+
+Our example shows two similarly sized galaxies from different
+ classes. The slopes have a similar fall-off, making it difficult 
+to distinguish them from radial profile alone. The plots have the 
+same normalization, radial binning, and spatial scale. 
+
+Task C: Date: 2026-11-13 09:25:52 +0100 
+	Hash: f23413843eecfe84893dff681dac8d9a534efb57  2026-11-13 09:25:52 +0100 
 counting how many galaxies in train set per class
 {'smooth_round': 1993, 'smooth_cigar': 1994, 'edge_on_disk': 1993, 'unbarred_spiral': 2020}
+
+what we lost going from 2d to 1d: Galaxy colour, geom features (eccentricity, asimmetries, …)
+
+
+
 
 
