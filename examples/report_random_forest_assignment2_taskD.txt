@@ -1,0 +1,69 @@
+Random Forest on GalaxyMNIST - Assignment 2, Task D
+============================================================
+Random seed: 10
+Classes (rows/columns of the matrices): smooth_round, smooth_cigar, edge_on_disk, unbarred_spiral
+Fitting set: 6400 galaxies, validation set: 1600 galaxies (20% of the official train set, stratified), official test set: 2000 galaxies
+Number of features: 35
+Features: radial brightness profile (first 32 bins) and mean R, G, B colour.
+The radial profile keeps how light is concentrated with radius; the mean colour recovers part of the colour information lost in the profile plot.
+
+Configuration 1: n_estimators=50, max_depth=5
+Validation confusion matrix (rows = true, columns = predicted):
+[[240  31  65  62]
+ [ 48 238  83  30]
+ [ 64 119 194  22]
+ [ 44  67  15 278]]
+Validation accuracy: 0.5938
+Validation macro precision: 0.5954
+
+Configuration 2: n_estimators=100, max_depth=10
+Validation confusion matrix (rows = true, columns = predicted):
+[[254  26  64  54]
+ [ 27 251 105  16]
+ [ 50  90 246  13]
+ [ 39  41  24 300]]
+Validation accuracy: 0.6569
+Validation macro precision: 0.6613
+
+Configuration 3: n_estimators=200, max_depth=10
+Validation confusion matrix (rows = true, columns = predicted):
+[[257  25  61  55]
+ [ 27 250 106  16]
+ [ 50  89 246  14]
+ [ 43  41  22 298]]
+Validation accuracy: 0.6569
+Validation macro precision: 0.6606
+
+Configuration 4: n_estimators=200, max_depth=None
+Validation confusion matrix (rows = true, columns = predicted):
+[[251  28  62  57]
+ [ 27 255 101  16]
+ [ 46  91 248  14]
+ [ 37  34  22 311]]
+Validation accuracy: 0.6656
+Validation macro precision: 0.6686
+
+Selected configuration: n_estimators=200, max_depth=None
+Selection rule: highest validation accuracy (ties broken by macro precision).
+The selected model is not retrained on train+validation before the test.
+
+Evaluation on the official test set (done once):
+[[346  28  47  86]
+ [ 40 330 114  22]
+ [ 68 126 300  13]
+ [ 49  41  29 361]]
+Test accuracy: 0.6685
+Test macro precision: 0.6694
+
+Feature importance of the selected model:
+Total importance, radial profile: 0.945
+Total importance, mean colour: 0.055
+Most important features:
+  profile bin 1: 0.066
+  profile bin 0: 0.065
+  profile bin 6: 0.057
+  profile bin 2: 0.053
+  profile bin 7: 0.049
+  profile bin 5: 0.046
+  profile bin 3: 0.043
+  profile bin 8: 0.042
