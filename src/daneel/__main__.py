@@ -5,7 +5,7 @@ from pathlib import Path
 from daneel.detection import TransitModel
 from daneel.parameters import Parameters
 from daneel.galaxies import morphology
-
+from daneel.galaxies.random_forest_class import GalaxyRandomForest
 
 def main():
     parser = argparse.ArgumentParser(description="Model and analyse exoplanet transits.")
@@ -13,11 +13,13 @@ def main():
     parser.add_argument("-i", "--input", dest="input_file", type=str, required=True, help="Input par file to pass")
     actions = parser.add_mutually_exclusive_group(required=True)
     actions.add_argument("-t", "--transit", action="store_true", help="Plot a transit light curve")
-    actions.add_argument("-d", "--detect", action="store_true", help="Run exoplanet detection")
+    actions.add_argument("-d", "--detection", choices=["rf"], default=None,
+        help="Run a classifier: 'rf' = Random Forest galaxy morphology "
+        "(settings are read from the 'random_forest' section of the input file)")
     actions.add_argument("-a", "--atmosphere", action="store_true", help="Run atmospheric characterisation")
     actions.add_argument("-g", "--galaxy", action="store_true", help="Plot a GalaxyMNIST galaxy and its radial brightness profile "
         "(data_root, split and index are read from the 'galaxy' section of the input file)")
-    parser.add_argument("-o", "--output", default=None, help="Output image for --transit (default: lc.png) or --galax (default: galaxy.png)")
+    parser.add_argument("-o", "--output", default=None, help="Output image for --transit (default: lc.png) or --galaxy (default: galaxy.png)")
     parser.add_argument("-idx", "--index", type=int, default=None, help="GalaxyMNIST image index; only used with --galaxy when the "
         "input file's 'galaxy' section has no 'index'")
     args = parser.parse_args()
@@ -27,11 +29,7 @@ def main():
 
     input_pars = Parameters(args.input_file).params
 
-    if args.transit:
-        transit = TransitModel(input_pars['transit'])
-        transit.plot_light_curve(args.output or "lc.png")
-
-    elif args.galaxy:
+    if args.galaxy:
         from daneel.galaxies import plot_galaxy
 
         galaxy_pars = input_pars.get("galaxy")
@@ -41,7 +39,7 @@ def main():
         if galaxy_pars.get("data_root") is None:
             parser.error("'galaxy' section is missing: data_root")
 
-        # The YAML takes priority; --index is only a fallback.
+        # The YAML takes priority; --index is only a fallback
         index = galaxy_pars.get("index")
         if index is None:
             index = args.index
@@ -66,8 +64,18 @@ def main():
         print(f"Galaxy {result['index']} ({result['split']}): {result['class_name']}")
         print(f"Saved: {result['output_path']}")
 
-    elif args.detect:
-        parser.error("detection is not implemented yet; use --transit")
+    elif args.detection == "rf":
+
+        rf_pars = input_pars.get("random_forest")
+        if not isinstance(rf_pars, dict):
+            parser.error("input file must contain a 'random_forest' section")
+        if rf_pars.get("data_root") is None:
+            parser.error("'random_forest' section is missing: data_root")
+        if not Path(rf_pars["data_root"]).expanduser().is_absolute():
+            parser.error("random_forest.data_root must be an absolute path")
+
+        GalaxyRandomForest(rf_pars).run()
+    
     elif args.atmosphere:
         parser.error("atmospheric characterisation is not implemented yet; use --transit")
 
