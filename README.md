@@ -32,9 +32,8 @@ pip install -e '.[dev,docs]'
 After installation, you can run daneel from the command line:
 
 ```bash
-daneel -i <input_file> --transit [--output lightcurve.png]
-daneel -i <input_file> --galaxy [--output galaxy.png]
 daneel -i <input_file> --galaxy [--index N] [--output galaxy.png]
+daneel -i <input_file> -d rf
 ```
 
 ### Command-line options
@@ -42,8 +41,8 @@ daneel -i <input_file> --galaxy [--index N] [--output galaxy.png]
 - `-i, --input`: Input parameter file (required)
 - `-t, --transit`: Generate a transit light curve from the YAML input
 - `-g, --galaxy`: Plot a GalaxyMNIST galaxy and its azimuthally averaged radial brightness profile
+- `-d, --detection rf`: Train and test a Random Forest classifier on GalaxyMNIST
 - `-o, --output`: Output path for the plot (default: `lc.png` for `--transit`, `galaxy.png` for `--galaxy`)
-- `-d, --detect`: Reserved for the course detection exercise
 - `-a, --atmosphere`: Reserved for the course atmosphere exercise
 - `-o, --output`: Output path for the transit plot (default: `lc.png`)
 - `--index`: Zero-based index of the galaxy to plot with `--galaxy` (default: 7). Valid range: 0–7999 for the train split
@@ -51,33 +50,55 @@ daneel -i <input_file> --galaxy [--index N] [--output galaxy.png]
 ### Examples
 
 ```bash
-# Run exoplanet detection
-daneel -i examples/params.yaml --transit --output lightcurve.png
+## Galaxy morphology
+daneel -i examples/params.yaml --galaxy --output galaxy.png
 
-# Run atmospheric characterization
-daneel -i examples/params.yaml --detect
-
-# Run both detection and atmospheric analysis
-daneel -i examples/params.yaml --atmosphere
+# Run the Random Forest classifier
+daneel -i examples/params.yaml -d rf
 ```
+
 ## Galaxy morphology
 
-```bash
-daneel -i examples/params.yaml --galaxy --output galaxy.png
-```
-# Plot a different galaxy
-daneel -i examples/params.yaml --galaxy --index <galaxy_index> --output galaxy_<galaxy_index>.png
-
-Plots one real GalaxyMNIST galaxy (currently train split, index 7) with its class
+`--galaxy` plots one real GalaxyMNIST galaxy (currently train split, index 7) with its class
 and azimuthally averaged radial brightness profile. The official GalaxyMNIST download
 links no longer work, so the data are read from the Hugging Face mirror
 `matthieulel/galaxy_mnist` and resized to 64x64. The first run downloads about 780 MB
 into the Hugging Face cache and needs internet access.
 
+### Random Forest classifier
+
+```bash
+daneel -i path_to_the_parameters.yaml -d rf
+```
+
+This classifies the galaxies into the four morphology classes with a Random Forest.
+For each galaxy, the features are the radial brightness profile and the mean R, G, B colour.
+Several Random Forest configurations are trained and compared on a validation set
+(a stratified part of the train set), and the best one is then evaluated once on the test set.
+
+All the settings are read from the `random_forest` section of the YAML file.
+
+
 ## Input File Format
 
-The input file should be a YAML file containing the necessary parameters for the analysis.
+The input file is a YAML file with one section for each analysis (`transit`, `galaxy`, `random_forest`).
+For the Random Forest:
 
+```yaml
+random_forest:
+  data_root: /path/to/data/          # folder containing GalaxyMNIST/raw/ (absolute path)
+  output_dir: /path/to/output        # where report and figure are saved
+  seed: 10                           # random seed
+  validation_size: 0.2               # fraction of the train set used for validation
+  features:
+    n_profile_bins: 32               # number of radial profile bins used as features
+    use_colour: true                 # add the mean R, G, B colour to the features
+  hyperparameters:                   # configurations to compare
+    - {n_estimators: 50,  max_depth: 5}
+    - {n_estimators: 100, max_depth: 10}
+    - {n_estimators: 200, max_depth: 10}
+    - {n_estimators: 200, max_depth: null}   # null = no depth limit
+```
 ## Development
 
 Run the test suite and style checks with:

@@ -121,7 +121,7 @@ def write_report(path, n_features, n_train, n_val, n_test, results, best, test, 
  
 #running with main built in the py file
 def main():
-    parser = argparse.ArgumentParser(description="Random Forest on GalaxyMNIST (Task D).")
+    parser = argparse.ArgumentParser(description="Random Forest on GalaxyMNIST.")
     parser.add_argument("--data-root", required=True, help="Dataset root (absolute path)")
     parser.add_argument("--output-dir", default=".", help="Folder for report and figure")
     args = parser.parse_args()

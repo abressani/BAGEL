@@ -4,3 +4,17 @@ galaxy:
   index: [2, 7, 27, 34]
   output_dir: C:/Users/magri/Desktop/ca2627/local_BAGEL/Assignment2
   output: assignment2_taskC.png
+
+random_forest:
+  data_root: C:/Users/magri/Desktop/ca2627/local_BAGEL/data/
+  output_dir: C:/Users/magri/Desktop/ca2627/local_BAGEL/Assignment2
+  seed: 10
+  validation_size: 0.2
+  features:
+    n_profile_bins: 32
+    use_colour: true
+  hyperparameters:
+    - {n_estimators: 50,  max_depth: 5}
+    - {n_estimators: 100, max_depth: 10}
+    - {n_estimators: 200, max_depth: 10}
+    - {n_estimators: 200, max_depth: null}
