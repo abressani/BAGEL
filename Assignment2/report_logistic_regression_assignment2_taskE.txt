@@ -1,0 +1,30 @@
+Logistic Regression on GalaxyMNIST - Assignment 2, Task E
+============================================================
+Model: LogisticRegression(C=1.0, max_iter=1000), multi-class (4 classes)
+Feature scaling: StandardScaler (mean 0, std 1 for every feature), fitted on the fitting set only, using a scikit-learn Pipeline.
+Random seed: 10
+Classes (rows/columns of the matrices): smooth_round, smooth_cigar, edge_on_disk, unbarred_spiral
+Fitting set: 6400 galaxies, validation set: 1600 galaxies (20% of the official train set, stratified), official test set: 2000 galaxies
+Number of features: 35
+Features: radial brightness profile (first 32 bins) and mean R, G, B colour 
+Validation confusion matrix (rows = true, columns = predicted):
+[[222  46  68  62]
+ [ 49 278  62  10]
+ [ 99  83 193  24]
+ [ 32  30  32 310]]
+Validation accuracy: 0.6269
+Validation macro precision: 0.6239
+
+Comparison with the Random Forest baseline (validation set):
+  Random Forest (n_estimators=200, max_depth=None): accuracy 0.6656, macro precision 0.6686
+  Logistic Regression: accuracy 0.6269, macro precision 0.6239
+  Difference (Logistic Regression - Random Forest): accuracy -0.0387, macro precision -0.0447
+  Rough statistical error on one accuracy (1600 galaxies): Approximate binomial standard error of validation accuracy: 0.0121
+
+Evaluation on the official test set (done once, on this final model):
+[[281  65  82  79]
+ [ 62 347  81  16]
+ [131 120 235  21]
+ [ 39  32  38 371]]
+Test accuracy: 0.6170
+Test macro precision: 0.6160
