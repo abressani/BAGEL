@@ -1,13 +1,13 @@
 galaxy:
-  data_root: C:/Users/magri/Desktop/ca2627/local_BAGEL/data/
+  data_root: /Users/alessandro/Documents/CompAstro/BAGEL/data/
   split: train
   index: [2, 7, 27, 34]
-  output_dir: C:/Users/magri/Desktop/ca2627/local_BAGEL/Assignment2
+  output_dir: /Users/alessandro/Documents/CompAstro/BAGEL/examples
   output: assignment2_taskC.png
 
 random_forest:
-  data_root: C:/Users/magri/Desktop/ca2627/local_BAGEL/data/
-  output_dir: C:/Users/magri/Desktop/ca2627/local_BAGEL/Assignment2
+  data_root: /Users/alessandro/Documents/CompAstro/BAGEL/data/
+  output_dir: /Users/alessandro/Documents/CompAstro/BAGEL/examples
   seed: 10
   validation_size: 0.2
   features:

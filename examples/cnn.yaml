@@ -1,0 +1,11 @@
+cnn:
+  data_root: /Users/alessandro/Documents/CompAstro/BAGEL/data/      # folder that contains GalaxyMNIST/raw/
+  output_dir: /Users/alessandro/Documents/CompAstro/BAGEL/examples   # created if missing
+  channels: [16, 32, 64]                 # one conv block per entry
+  dropout: 0.0
+  lr: 0.001
+  epochs: 60
+  batch_size: 32
+  validation_fraction: 0.25
+  seed: 42
+  evaluate_test: false                    # official test set; use only for the final, fixed settings

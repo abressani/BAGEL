@@ -1,0 +1,57 @@
+Random Forest on GalaxyMNIST
+============================================================
+Random seed: 10
+Classes (rows/columns): smooth_round, smooth_cigar, edge_on_disk, unbarred_spiral
+Fitting set: 6400, validation set: 1600, test set: 2000
+Features: 35 (profile bins: 32, mean colour: True)
+
+Configuration 1: n_estimators=50, max_depth=5
+Validation confusion matrix (rows = true, columns = predicted):
+[[240  31  65  62]
+ [ 48 238  83  30]
+ [ 64 119 194  22]
+ [ 44  67  15 278]]
+Validation accuracy: 0.5938
+Validation macro precision: 0.5954
+Validation macro recall: 0.5935
+
+Configuration 2: n_estimators=100, max_depth=10
+Validation confusion matrix (rows = true, columns = predicted):
+[[254  26  64  54]
+ [ 27 251 105  16]
+ [ 50  90 246  13]
+ [ 39  41  24 300]]
+Validation accuracy: 0.6569
+Validation macro precision: 0.6613
+Validation macro recall: 0.6566
+
+Configuration 3: n_estimators=200, max_depth=10
+Validation confusion matrix (rows = true, columns = predicted):
+[[257  25  61  55]
+ [ 27 250 106  16]
+ [ 50  89 246  14]
+ [ 43  41  22 298]]
+Validation accuracy: 0.6569
+Validation macro precision: 0.6606
+Validation macro recall: 0.6566
+
+Configuration 4: n_estimators=200, max_depth=None
+Validation confusion matrix (rows = true, columns = predicted):
+[[251  28  62  57]
+ [ 27 255 101  16]
+ [ 46  91 248  14]
+ [ 37  34  22 311]]
+Validation accuracy: 0.6656
+Validation macro precision: 0.6686
+Validation macro recall: 0.6653
+
+Selected: n_estimators=200, max_depth=None (best validation accuracy)
+
+Official test set (evaluated once):
+[[346  28  47  86]
+ [ 40 330 114  22]
+ [ 68 126 300  13]
+ [ 49  41  29 361]]
+Test accuracy: 0.6685
+Test macro precision: 0.6694
+Test macro recall: 0.6696

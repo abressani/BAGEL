@@ -12,6 +12,7 @@ Documentation: <https://tiziano1590.github.io/comp_astro_26/>.
 ### Prerequisites
 
 - Python >= 3.10
+- PyTorch (`torch`) for the CNN classifier (`-d cnn`)
 
 ### Install from source
 
@@ -34,36 +35,49 @@ After installation, you can run daneel from the command line:
 ```bash
 daneel -i <input_file> --galaxy [--index N] [--output galaxy.png]
 daneel -i <input_file> -d rf
+daneel -i <input_file> -d cnn
 ```
+
+All the paths are read from the input file, so the command can be run from any
+directory, including one outside the repository.
 
 ### Command-line options
 
 - `-i, --input`: Input parameter file (required)
 - `-t, --transit`: Generate a transit light curve from the YAML input
 - `-g, --galaxy`: Plot a GalaxyMNIST galaxy and its azimuthally averaged radial brightness profile
-- `-d, --detection rf`: Train and test a Random Forest classifier on GalaxyMNIST
+- `-d, --detection {rf,cnn}`: Train and test a classifier on GalaxyMNIST: `rf` = Random Forest, `cnn` = convolutional neural network (PyTorch)
 - `-o, --output`: Output path for the plot (default: `lc.png` for `--transit`, `galaxy.png` for `--galaxy`)
 - `-a, --atmosphere`: Reserved for the course atmosphere exercise
-- `-o, --output`: Output path for the transit plot (default: `lc.png`)
-- `--index`: Zero-based index of the galaxy to plot with `--galaxy` (default: 7). Valid range: 0–7999 for the train split
+- `--index`: Zero-based index of the galaxy to plot with `--galaxy`. It is only used when the `galaxy` section of the input file has no `index`. Valid range: 0–7999 for the train split
 
 ### Examples
 
 ```bash
-## Galaxy morphology
+# Galaxy morphology
 daneel -i examples/params.yaml --galaxy --output galaxy.png
 
 # Run the Random Forest classifier
 daneel -i examples/params.yaml -d rf
+
+# Run the convolutional neural network
+daneel -i examples/params.yaml -d cnn
 ```
 
 ## Galaxy morphology
 
-`--galaxy` plots one real GalaxyMNIST galaxy (currently train split, index 7) with its class
-and azimuthally averaged radial brightness profile. The official GalaxyMNIST download
-links no longer work, so the data are read from the Hugging Face mirror
-`matthieulel/galaxy_mnist` and resized to 64x64. The first run downloads about 780 MB
-into the Hugging Face cache and needs internet access.
+`--galaxy` plots one real GalaxyMNIST galaxy with its class and its azimuthally
+averaged radial brightness profile. The dataset folder, the split and the galaxy index
+are read from the `galaxy` section of the YAML file (see below). The images are
+read from `<data_root>/GalaxyMNIST/raw/<split>_dataset.hdf5`.
+
+If that file is not found, the data are read from the Hugging Face mirror
+`matthieulel/galaxy_mnist` instead (the official GalaxyMNIST download links no longer
+work) and resized to 64x64. This ignores `data_root`, needs internet access, and the
+first run downloads about 780 MB into the Hugging Face cache.
+
+The output image is saved as `output_dir/output` if the YAML file gives them,
+otherwise as the `-o/--output` path (default `galaxy.png`).
 
 ### Random Forest classifier
 
@@ -78,10 +92,52 @@ Several Random Forest configurations are trained and compared on a validation se
 
 All the settings are read from the `random_forest` section of the YAML file.
 
+### Convolutional neural network
+
+```bash
+daneel -i path_to_the_parameters.yaml -d cnn
+```
+
+This classifies the galaxies into the same four morphology classes with a PyTorch
+CNN trained directly on the 64x64 RGB images. The network has one block (3x3
+convolution, ReLU, 2x2 max pooling) per entry of `channels`, followed by global
+average pooling, dropout and a linear layer with four outputs. It is trained with
+Adam and cross-entropy loss on a stratified part of the official train set; the
+rest is the validation set. The reported metrics (accuracy, macro-averaged
+precision and recall, and the 4x4 confusion matrix) are those of the final epoch.
+Every run trains from scratch with the given seed, so the results are reproducible.
+
+If `evaluate_test` is true, the official test set is evaluated as well. The test
+set must not be used to choose a model, so set it to true only for the final,
+fixed settings.
+
+All the settings are read from the `cnn` section of the YAML file. The output, in
+`output_dir`, is:
+
+- `cnn_report.txt`: settings, metrics and confusion matrices
+- `cnn_confusion_matrix_validation.png`
+- `cnn_confusion_matrix_test.png` (if `evaluate_test` is true)
+- `cnn_weights.pt`: the trained weights
+
+daneel sets `KMP_DUPLICATE_LIB_OK=TRUE` before importing PyTorch, which avoids an
+`OMP: Error #15` crash that torch can cause on some macOS conda setups.
 
 ## Input File Format
 
-The input file is a YAML file with one section for each analysis (`transit`, `galaxy`, `random_forest`).
+The input file is a YAML file with one section for each analysis (`transit`, `galaxy`, `random_forest`, `cnn`).
+Each command reads only its own section, so one file can hold several of them.
+
+For the galaxy plot:
+
+```yaml
+galaxy:
+  data_root: /path/to/data/          # folder containing GalaxyMNIST/raw/ (absolute path)
+  split: train                       # train or test (default: train)
+  index: 42                          # galaxy index; if missing, --index is used
+  output: galaxy.png                 # optional, output file name
+  output_dir: /path/to/output        # optional, folder of the output file
+```
+
 For the Random Forest:
 
 ```yaml
@@ -99,6 +155,26 @@ random_forest:
     - {n_estimators: 200, max_depth: 10}
     - {n_estimators: 200, max_depth: null}   # null = no depth limit
 ```
+
+For the Convolutional Neural Network:
+
+```yaml
+cnn:
+  data_root: /path/to/data/          # folder containing GalaxyMNIST/raw/ (absolute path)
+  output_dir: /path/to/output        # report, figures and weights; created if missing
+  channels: [16, 32, 64]             # filters of each convolutional block
+  dropout: 0.0                       # dropout before the output layer
+  lr: 0.001                          # Adam learning rate
+  epochs: 60
+  batch_size: 32
+  validation_fraction: 0.25          # fraction of the train set used for validation
+  seed: 84631                        # random seed (split and weights)
+  evaluate_test: true                # official test set; only for the final, fixed settings
+```
+
+Only `data_root` is required. The other keys default to the values above, except
+`output_dir` (current directory) and `evaluate_test` (false).
+
 ## Development
 
 Run the test suite and style checks with:

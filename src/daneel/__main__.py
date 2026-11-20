@@ -5,7 +5,7 @@ from pathlib import Path
 from daneel.detection import TransitModel
 from daneel.parameters import Parameters
 from daneel.galaxies import morphology
-from daneel.galaxies.random_forest_class import GalaxyRandomForest
+from daneel.galaxies.ML_Classifier import GalaxyRandomForest, GalaxyCNN
 
 def main():
     parser = argparse.ArgumentParser(description="Model and analyse exoplanet transits.")
@@ -13,9 +13,10 @@ def main():
     parser.add_argument("-i", "--input", dest="input_file", type=str, required=True, help="Input par file to pass")
     actions = parser.add_mutually_exclusive_group(required=True)
     actions.add_argument("-t", "--transit", action="store_true", help="Plot a transit light curve")
-    actions.add_argument("-d", "--detection", choices=["rf"], default=None,
+    actions.add_argument("-d", "--detection", choices=["rf", "cnn"], default=None,
         help="Run a classifier: 'rf' = Random Forest galaxy morphology "
-        "(settings are read from the 'random_forest' section of the input file)")
+        "(settings from the 'random_forest' section of the input file); "
+        "'cnn' = four-class PyTorch CNN (settings from the 'cnn' section)")
     actions.add_argument("-a", "--atmosphere", action="store_true", help="Run atmospheric characterisation")
     actions.add_argument("-g", "--galaxy", action="store_true", help="Plot a GalaxyMNIST galaxy and its radial brightness profile "
         "(data_root, split and index are read from the 'galaxy' section of the input file)")
@@ -29,7 +30,11 @@ def main():
 
     input_pars = Parameters(args.input_file).params
 
-    if args.galaxy:
+    if args.transit:
+        transit = TransitModel(input_pars['transit'])
+        transit.plot_light_curve(args.output or "lc.png")
+
+    elif args.galaxy:
         from daneel.galaxies import plot_galaxy
 
         galaxy_pars = input_pars.get("galaxy")
@@ -75,7 +80,22 @@ def main():
             parser.error("random_forest.data_root must be an absolute path")
 
         GalaxyRandomForest(rf_pars).run()
-    
+
+    elif args.detection == "cnn":
+
+        cnn_pars = input_pars.get("cnn")
+        if not isinstance(cnn_pars, dict):
+            parser.error("input file must contain a 'cnn' section")
+        if cnn_pars.get("data_root") is None:
+            parser.error("'cnn' section is missing: data_root")
+        if not Path(cnn_pars["data_root"]).expanduser().is_absolute():
+            parser.error("cnn.data_root must be an absolute path")
+
+        try:
+            GalaxyCNN(cnn_pars).run()  # torch is imported only here
+        except (ValueError, FileNotFoundError) as exc:
+            parser.error(str(exc))
+
     elif args.atmosphere:
         parser.error("atmospheric characterisation is not implemented yet; use --transit")
 

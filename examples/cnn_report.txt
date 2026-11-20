@@ -1,0 +1,26 @@
+CNN on GalaxyMNIST
+============================================================
+Generated: 2026-11-20 11:17:15
+Classes (rows/columns): smooth_round, smooth_cigar, edge_on_disk, unbarred_spiral
+channels=(16, 32, 64), dropout=0.0, lr=0.001, epochs=60, batch_size=32, seed=42
+Optimiser: Adam; loss: CrossEntropyLoss; pixels divided by 255; no augmentation
+Fitting set: 6000, validation set: 2000
+Final training loss: 0.5044
+
+Validation set (final epoch):
+(rows = true class, columns = predicted class)
+                      smooth_round     smooth_cigar     edge_on_disk  unbarred_spiral
+smooth_round                   450                4                5               39
+smooth_cigar                    10              350              118               21
+edge_on_disk                    12              108              356               22
+unbarred_spiral                 87               11               14              393
+Accuracy: 0.7745
+Macro precision: 0.7736
+Macro recall: 0.7745
+Per-class precision and recall:
+  smooth_round      precision=0.805  recall=0.904
+  smooth_cigar      precision=0.740  recall=0.701
+  edge_on_disk      precision=0.722  recall=0.715
+  unbarred_spiral   precision=0.827  recall=0.778
+
+Official test set: not evaluated (set evaluate_test: true).
