@@ -12,7 +12,6 @@ def main():
 
     parser.add_argument("-i", "--input", dest="input_file", type=str, required=True, help="Input par file to pass")
     actions = parser.add_mutually_exclusive_group(required=True)
-    actions.add_argument("-t", "--transit", action="store_true", help="Plot a transit light curve")
     actions.add_argument("-d", "--detection", choices=["rf", "cnn"], default=None,
         help="Run a classifier: 'rf' = Random Forest galaxy morphology "
         "(settings from the 'random_forest' section of the input file); "
@@ -30,11 +29,8 @@ def main():
 
     input_pars = Parameters(args.input_file).params
 
-    if args.transit:
-        transit = TransitModel(input_pars['transit'])
-        transit.plot_light_curve(args.output or "lc.png")
 
-    elif args.galaxy:
+    if args.galaxy:
         from daneel.galaxies import plot_galaxy
 
         galaxy_pars = input_pars.get("galaxy")

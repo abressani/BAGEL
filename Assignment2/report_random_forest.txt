@@ -17,41 +17,41 @@ Validation macro recall: 0.5935
 
 Configuration 2: n_estimators=100, max_depth=10
 Validation confusion matrix (rows = true, columns = predicted):
-[[254  26  64  54]
- [ 27 251 105  16]
- [ 50  90 246  13]
- [ 39  41  24 300]]
-Validation accuracy: 0.6569
-Validation macro precision: 0.6613
-Validation macro recall: 0.6566
+[[252  26  65  55]
+ [ 27 249 107  16]
+ [ 48  91 247  13]
+ [ 42  42  22 298]]
+Validation accuracy: 0.6538
+Validation macro precision: 0.6584
+Validation macro recall: 0.6535
 
 Configuration 3: n_estimators=200, max_depth=10
 Validation confusion matrix (rows = true, columns = predicted):
-[[257  25  61  55]
- [ 27 250 106  16]
- [ 50  89 246  14]
- [ 43  41  22 298]]
-Validation accuracy: 0.6569
-Validation macro precision: 0.6606
-Validation macro recall: 0.6566
+[[259  25  60  54]
+ [ 27 251 106  15]
+ [ 48  91 246  14]
+ [ 43  43  21 297]]
+Validation accuracy: 0.6581
+Validation macro precision: 0.6622
+Validation macro recall: 0.6579
 
 Configuration 4: n_estimators=200, max_depth=None
 Validation confusion matrix (rows = true, columns = predicted):
-[[251  28  62  57]
+[[251  28  63  56]
  [ 27 255 101  16]
- [ 46  91 248  14]
- [ 37  34  22 311]]
-Validation accuracy: 0.6656
-Validation macro precision: 0.6686
-Validation macro recall: 0.6653
+ [ 46  90 250  13]
+ [ 37  33  22 312]]
+Validation accuracy: 0.6675
+Validation macro precision: 0.6707
+Validation macro recall: 0.6671
 
 Selected: n_estimators=200, max_depth=None (best validation accuracy)
 
 Official test set (evaluated once):
-[[346  28  47  86]
- [ 40 330 114  22]
- [ 68 126 300  13]
- [ 49  41  29 361]]
-Test accuracy: 0.6685
-Test macro precision: 0.6694
-Test macro recall: 0.6696
+[[350  27  45  85]
+ [ 41 328 116  21]
+ [ 70 124 300  13]
+ [ 47  41  30 362]]
+Test accuracy: 0.6700
+Test macro precision: 0.6708
+Test macro recall: 0.6711
