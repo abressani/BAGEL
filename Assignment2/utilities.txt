@@ -1,8 +1,8 @@
 Task A: Date: 2026-11-06 09:39:52 +0100
-	Hash: 1271b2a2ab25276381425bc283770fd88a66dc59
+		Hash: 1271b2a2ab25276381425bc283770fd88a66dc59
 
 Task B: Date: 2026-11-09 17:49:30 +0100 
-	Hash: 398d5aef42d933d0c53aca6d14f0a9a2ac046e5c 
+		Hash: 398d5aef42d933d0c53aca6d14f0a9a2ac046e5c 
 	Comparison: There's a degeneracy between the surface brightness fall 
 		    off and size of the galaxy. For example, a small edge-on disk 
 		    has a similar profile as a large smooth cigar. By collapsing to 1D, 
@@ -14,17 +14,24 @@ to distinguish them from radial profile alone. The plots have the
 same normalization, radial binning, and spatial scale. 
 
 Task C: Date: 2026-11-13 09:25:52 +0100 
-	Hash: f23413843eecfe84893dff681dac8d9a534efb57
+		Hash: f23413843eecfe84893dff681dac8d9a534efb57
 	counting how many galaxies in train set per class
 	{'smooth_round': 1993, 'smooth_cigar': 1994, 'edge_on_disk': 1993, 'unbarred_spiral': 2020}
 	What we lost going from 2d to 1d: Galaxy colour, geometric features (shape, asymmetries, spiral arms, inclination)
 
 Task D: Date: Mon Nov 16 17:46:31 2026 +0100
-	Hash: b2f50d7bd368d2ca41798f1cadb5956d2387c799
+		Hash: b2f50d7bd368d2ca41798f1cadb5956d2387c799
 
 Task E: Date: 2026-11-19 17:35:57 +0100
- 	Hash: 6706065bb2733fd18b5e41c3a38def83fb166fe0
+ 		Hash: 6706065bb2733fd18b5e41c3a38def83fb166fe0
 
+Task F: Date: 2026-11-20 08:59:43 +0100 
+		HAsh: c19e9a52de8520569223dab339e83bd16313a884 
 
+Task G: Date: 2026-11-19 17:33:39 +0100 
+		Hash: 0fc05dae47d3db767f431fe81ac0e0c68b5b8ab9  
+		the right class has:
+		Date:  2026-11-20 09:05:23 +0100 
+		Hash: b94f8cb8bee4276b92acceb8f2ac8a3524f68b14 
 
 
