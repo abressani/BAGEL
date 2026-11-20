@@ -53,27 +53,6 @@ class GalaxyRandomForest:
     The configuration with the best validation accuracy is selected.
     """
 
-    def __init__(
-        self,
-        data_root,
-        output_dir=".",
-        seed=10,
-        n_profile_bins=32,
-        use_colour=True,
-        validation_size=0.2,
-        hyperparameters=None,
-    ):
-        self.data_root = Path(data_root)
-        self.output_dir = Path(output_dir)
-        self.seed = int(seed)
-        self.n_profile_bins = int(n_profile_bins)
-        self.use_colour = bool(use_colour)
-        self.validation_size = float(validation_size)
-        self.hyperparameters = hyperparameters or DEFAULT_HYPERPARAMETERS
-        self.results = []
-        self.best = None
-        self.test_metrics = None
-
     #setup
     def __init__(self, params):
         features = params.get("features", {})
