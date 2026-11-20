@@ -1,0 +1,94 @@
+CNN ASSIGNMENT 2, TASK F: FOUR-CLASS GALAXYMNIST
+Report generated: 2026-11-19 19:25:42
+
+COMMON TRAINING SETTINGS (identical for all four configurations)
+  Classes: 0=smooth_round, 1=smooth_cigar, 2=edge_on_disk, 3=unbarred_spiral
+  Official training set: 8000 images; stratified split 6000 fit / 2000 validation (test_size=0.25, random_state=42)
+  Preprocessing: pixel values divided by 255; NHWC converted to NCHW; no augmentation
+  Architecture: per block Conv2d(3x3, padding=1) -> ReLU -> MaxPool2d(2); then global average
+                pooling -> Dropout -> Linear(last channels, 4 logits)
+  Loss: CrossEntropyLoss; optimiser: Adam; batch size: 32; device: cpu
+  Seed: 42 (same weight initialization and batch order for every configuration)
+  Validation metrics below are from the FINAL epoch (no best-epoch selection).
+
+
+CONFIGURATION: baseline
+  channels=(16, 32)  dropout=0.0  lr=0.001  epochs=60  parameters=5220
+  final training loss: 0.9754
+  validation accuracy: 0.6130  (mean of last 5 epochs: 0.6006)
+  validation macro-averaged precision: 0.6193
+  validation confusion matrix:
+(rows = true class, columns = predicted class)
+                      smooth_round     smooth_cigar     edge_on_disk  unbarred_spiral
+smooth_round                   303              104               31               60
+smooth_cigar                    37              323               90               49
+edge_on_disk                    29              158              258               53
+unbarred_spiral                 83               33               47              342
+
+
+CONFIGURATION: wider
+  channels=(32, 64)  dropout=0.0  lr=0.001  epochs=60  parameters=19652
+  final training loss: 0.8017
+  validation accuracy: 0.6850  (mean of last 5 epochs: 0.6862)
+  validation macro-averaged precision: 0.6913
+  validation confusion matrix:
+(rows = true class, columns = predicted class)
+                      smooth_round     smooth_cigar     edge_on_disk  unbarred_spiral
+smooth_round                   428               16                8               46
+smooth_cigar                    50              350               65               34
+edge_on_disk                    43              175              241               39
+unbarred_spiral                113               20               21              351
+
+
+CONFIGURATION: deeper
+  channels=(16, 32, 64)  dropout=0.0  lr=0.001  epochs=60  parameters=23844
+  final training loss: 0.5044
+  validation accuracy: 0.7745  (mean of last 5 epochs: 0.7770)
+  validation macro-averaged precision: 0.7736
+  validation confusion matrix:
+(rows = true class, columns = predicted class)
+                      smooth_round     smooth_cigar     edge_on_disk  unbarred_spiral
+smooth_round                   450                4                5               39
+smooth_cigar                    10              350              118               21
+edge_on_disk                    12              108              356               22
+unbarred_spiral                 87               11               14              393
+
+
+CONFIGURATION: higher_lr
+  channels=(16, 32)  dropout=0.0  lr=0.003  epochs=60  parameters=5220
+  final training loss: 0.7041
+  validation accuracy: 0.7080  (mean of last 5 epochs: 0.7172)
+  validation macro-averaged precision: 0.7119
+  validation confusion matrix:
+(rows = true class, columns = predicted class)
+                      smooth_round     smooth_cigar     edge_on_disk  unbarred_spiral
+smooth_round                   444                6                3               45
+smooth_cigar                    40              355               75               29
+edge_on_disk                    34              180              249               35
+unbarred_spiral                107               14               16              368
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+MODEL SELECTION
+  Selected final CNN: deeper
+  Criterion: highest validation accuracy (macro precision as cross-check); test set not used for selection.
+  Highest validation accuracy among the four: deeper
+  The selected model was trained on the fit split only.
+
+OFFICIAL HELD-OUT TEST SET (selected model 'deeper' only; evaluated once)
+  test images: 2000
+  test accuracy: 0.7870
+  test macro-averaged precision: 0.7868
+  test confusion matrix:
+(rows = true class, columns = predicted class)
+                      smooth_round     smooth_cigar     edge_on_disk  unbarred_spiral
+smooth_round                   475                2                3               27
+smooth_cigar                     9              367              118               12
+edge_on_disk                    19              120              346               22
+unbarred_spiral                 72                7               15              386
+
+  per-class test precision and recall:
+  smooth_round      precision=0.826  recall=0.937
+  smooth_cigar      precision=0.740  recall=0.725
+  edge_on_disk      precision=0.718  recall=0.682
+  unbarred_spiral   precision=0.864  recall=0.804
