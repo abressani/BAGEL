@@ -34,4 +34,13 @@ Task G: Date: 2026-11-19 17:33:39 +0100
 		Date:  2026-11-20 09:05:23 +0100 
 		Hash: b94f8cb8bee4276b92acceb8f2ac8a3524f68b14 
 
+Task H: Date: 2026-11-20 11:44:53 +0100 
+		Hash: 6a5bc0713618d828eddce099fc7b5001b97bd2aa  
 
+Task I: 
+2nd part
+Date: 2026-11-25 13:16:38 +0100 
+Hash: 49b85445227a88c7e9b04e99b78de63c638a96aa 
+1st part:
+Date: 2026-11-25 13:58:54 +0100 
+Hash: e8ea241f16aff5b080a5eb411524515cdeedd7de  
