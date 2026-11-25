@@ -17,11 +17,11 @@ the other daneel commands do not need torch.
 """
 from __future__ import annotations
 
-import os
-os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
-os.environ["OMP_NUM_THREADS"] = "1"
+import os   #to work with operating system dependent functionality
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE" #to manage possibly conflicts bw libraries (--pytorch)
+os.environ["OMP_NUM_THREADS"] = "1" #to avoid overload
 import torch
-torch.set_num_threads(1)
+torch.set_num_threads(1) #to avoid overload
 
 from datetime import datetime
 from pathlib import Path
@@ -431,7 +431,30 @@ class GalaxyCNN(GalaxyClassifier):
         with torch.no_grad():
             return self.model(x.permute(0, 3, 1, 2).contiguous()).argmax(1).numpy()
 
+    
     #outputs
+
+    def save_explain_data(self, path, x_test, y_test, y_pred, probabilities):
+        """Save everything needed to explain this exact trained CNN."""
+
+        torch.save({
+            "state_dict": self.model.state_dict(),
+            "channels": self.channels,
+            "dropout": self.dropout,
+            "x_test": x_test.cpu(),
+            "y_test": y_test.cpu(),
+            "y_pred": torch.as_tensor(y_pred),
+            "probabilities": probabilities.cpu(),
+            "config": {
+                "seed": self.seed,
+                "lr": self.lr,
+                "epochs": self.epochs,
+                "batch_size": self.batch_size,
+                "validation_fraction": self.validation_fraction,
+            },
+            "class_names": CLASS_NAMES,
+        }, path)
+
     def save_report(self, path, n_fit, n_val, n_test):
         lines = [
             "CNN on GalaxyMNIST",
@@ -446,6 +469,7 @@ class GalaxyCNN(GalaxyClassifier):
             f"Final training loss: {self.history[-1][0]:.4f}",
             "",
         ]
+
         for name, m in self.results.items():
             title = "Validation set" if name == "validation" else "Official test set"
             lines += [
@@ -458,59 +482,133 @@ class GalaxyCNN(GalaxyClassifier):
                 _per_class(m["cm"]),
                 "",
             ]
+
         if "test" not in self.results:
             lines.append("Official test set: not evaluated (set evaluate_test: true).")
+
         Path(path).write_text("\n".join(lines) + "\n", encoding="utf-8")
 
     #run
+
     def run(self):
         """Full pipeline: load, split, train, evaluate, save outputs."""
+
         from torch.utils.data import DataLoader, TensorDataset
 
         x, y = self.load_tensors("train")
+
         fit_idx, val_idx = train_test_split(
             np.arange(len(y)),
             test_size=self.validation_fraction,
             random_state=self.seed,
             stratify=y.numpy(),
         )
+
         fit_loader = DataLoader(
             TensorDataset(x[fit_idx], y[fit_idx]),
             batch_size=self.batch_size,
             shuffle=True,
             generator=torch.Generator().manual_seed(self.seed),
         )
+
         val_loader = DataLoader(
-            TensorDataset(x[val_idx], y[val_idx]), batch_size=self.batch_size, shuffle=False
+            TensorDataset(x[val_idx], y[val_idx]),
+            batch_size=self.batch_size,
+            shuffle=False,
         )
-        print(f"Fit: {len(fit_idx)} galaxies, validation: {len(val_idx)} galaxies; "
-              f"channels={self.channels}, lr={self.lr}, epochs={self.epochs}")
+
+        print(
+            f"Fit: {len(fit_idx)} galaxies, validation: {len(val_idx)} galaxies; "
+            f"channels={self.channels}, lr={self.lr}, epochs={self.epochs}"
+        )
 
         self.fit(fit_loader, val_loader)
 
-        self.results = {"validation": self.evaluate(*self._predict_loader(self.model, val_loader))}
+        self.results = {
+            "validation": self.evaluate(
+                *self._predict_loader(self.model, val_loader)
+            )
+        }
+
         n_test = None
+        explain_data = None
+
         if self.evaluate_test:
             x_test, y_test = self.load_tensors("test")
+
             test_loader = DataLoader(
-                TensorDataset(x_test, y_test), batch_size=self.batch_size, shuffle=False
+                TensorDataset(x_test, y_test),
+                batch_size=self.batch_size,
+                shuffle=False,
             )
-            self.results["test"] = self.evaluate(*self._predict_loader(self.model, test_loader))
+
+            self.model.eval()
+            all_probs = []
+
+            with torch.no_grad():
+                for xb, yb in test_loader:
+                    logits = self.model(xb)
+                    all_probs.append(torch.softmax(logits, dim=1))
+
+            probabilities = torch.cat(all_probs)
+            y_pred = probabilities.argmax(dim=1).numpy()
+
+            self.results["test"] = self.evaluate(
+                y_test.numpy(), y_pred
+            )
+
             self.test_metrics = self.results["test"]
             n_test = len(y_test)
 
+            explain_data = (
+                x_test, y_test, y_pred, probabilities
+            )
+
         self.output_dir.mkdir(parents=True, exist_ok=True)
+
         for name, m in self.results.items():
-            print(f"\n{name.upper()}: accuracy={m['accuracy']:.4f}, "
-                  f"precision={m['precision']:.4f}, recall={m['recall']:.4f}")
+            print(
+                f"\n{name.upper()}: accuracy={m['accuracy']:.4f}, "
+                f"precision={m['precision']:.4f}, recall={m['recall']:.4f}"
+            )
+
             print(_format_confusion(m["cm"]))
+
             figure = self.output_dir / f"cnn_confusion_matrix_{name}.png"
-            self.save_confusion_matrix(m["cm"], f"CNN - {name} set", figure, figsize=(7, 6), dpi=200)
+
+            self.save_confusion_matrix(
+                m["cm"],
+                f"CNN - {name} set",
+                figure,
+                figsize=(7, 6),
+                dpi=200,
+            )
 
         report = self.output_dir / "cnn_report.txt"
         weights = self.output_dir / "cnn_weights.pt"
-        self.save_report(report, len(fit_idx), len(val_idx), n_test)
+
+        self.save_report(
+            report, len(fit_idx), len(val_idx), n_test
+        )
+
         torch.save(self.model.state_dict(), weights)
+
         print(f"\nSaved: {report.resolve()}")
         print(f"Saved: {weights.resolve()}")
+
+        if explain_data is not None:
+            x_test, y_test, y_pred, probabilities = explain_data
+
+            explain_file = self.output_dir / "cnn_explain_data.pt"
+
+            self.save_explain_data(
+                explain_file,
+                x_test,
+                y_test,
+                y_pred,
+                probabilities,
+            )
+
+            print(f"Saved: {explain_file.resolve()}")
+
         return self.results

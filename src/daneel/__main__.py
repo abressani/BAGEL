@@ -6,6 +6,7 @@ from daneel.detection import TransitModel
 from daneel.parameters import Parameters
 from daneel.galaxies import morphology
 from daneel.galaxies.ML_Classifier import GalaxyRandomForest, GalaxyCNN
+from daneel.galaxies.investigate_cnn import GalaxyExplainer
 
 def main():
     parser = argparse.ArgumentParser(description="Model and analyse exoplanet transits.")
@@ -19,6 +20,8 @@ def main():
     actions.add_argument("-a", "--atmosphere", action="store_true", help="Run atmospheric characterisation")
     actions.add_argument("--dream", action="store_true", help="Train a GAN on GalaxyMNIST and generate synthetic galaxies "
         "(settings from the 'dream' section of the input file)")
+    actions.add_argument("--explain", action="store_true", help="Explain CNN predictions on GalaxyMNIST using Grad-CAM "
+         "(settings from the 'explain' section of the input file)")
     actions.add_argument("-g", "--galaxy", action="store_true", help="Plot a GalaxyMNIST galaxy and its radial brightness profile "
         "(data_root, split and index are read from the 'galaxy' section of the input file)")
     parser.add_argument("-o", "--output", default=None, help="Output image for --transit (default: lc.png) or --galaxy (default: galaxy.png)")
@@ -108,6 +111,22 @@ def main():
 
         try:
             GalaxyGAN(dream_pars).run()
+        except (ValueError, FileNotFoundError) as exc:
+            parser.error(str(exc))
+
+    elif args.explain:
+
+        explain_pars = input_pars.get("explain")
+        if not isinstance(explain_pars, dict):
+            parser.error("input file must contain an 'explain' section")
+
+        if explain_pars.get("results_file") is None:
+            parser.error("'explain' section is missing: results_file")
+
+        from daneel.galaxies.investigate_cnn import GalaxyExplainer
+
+        try:
+            GalaxyExplainer(explain_pars).run()
         except (ValueError, FileNotFoundError) as exc:
             parser.error(str(exc))
 

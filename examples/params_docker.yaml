@@ -1,0 +1,41 @@
+galaxy:
+  data_root: /ca26/ext_volume/local_BAGEL/data/
+  split: train
+  index: [2, 7, 27, 34]
+  output_dir: /ca26/ext_volume/local_BAGEL/Assignment2
+  output: assignment2_taskC.png
+
+random_forest:
+  data_root: /ca26/ext_volume/local_BAGEL/data/
+  output_dir: /ca26/ext_volume/local_BAGEL/output_prova
+  seed: 10
+  validation_size: 0.2
+  features:
+    n_profile_bins: 32
+    use_colour: true
+  hyperparameters:
+    - {n_estimators: 50,  max_depth: 5}
+    - {n_estimators: 100, max_depth: 10}
+    - {n_estimators: 200, max_depth: 10}
+    - {n_estimators: 200, max_depth: null}
+
+cnn:
+  data_root: /ca26/ext_volume/local_BAGEL/data/          
+  output_dir: /ca26/ext_volume/local_BAGEL/output_prova        
+  channels: [16, 32, 64]            
+  dropout: 0.0                       
+  lr: 0.001                         
+  epochs: 60
+  batch_size: 32
+  validation_fraction: 0.25         
+  seed: 84631                       
+  evaluate_test: true     
+
+explain:
+  results_file: /ca26/ext_volume/local_BAGEL/output_prova/cnn_explain_data.pt
+  output_dir: /ca26/ext_volume/local_BAGEL/output_prova
+  selection: random
+  n_per_group: 3
+  selection_seed: 10        #only for 'random'
+  #correct_indices: [..]     #only for 'manual' (indeces from test set)
+  #wrong_indices: [..]      
