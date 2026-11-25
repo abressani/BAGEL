@@ -17,6 +17,8 @@ def main():
         "(settings from the 'random_forest' section of the input file); "
         "'cnn' = four-class PyTorch CNN (settings from the 'cnn' section)")
     actions.add_argument("-a", "--atmosphere", action="store_true", help="Run atmospheric characterisation")
+    actions.add_argument("--dream", action="store_true", help="Train a GAN on GalaxyMNIST and generate synthetic galaxies "
+        "(settings from the 'dream' section of the input file)")
     actions.add_argument("-g", "--galaxy", action="store_true", help="Plot a GalaxyMNIST galaxy and its radial brightness profile "
         "(data_root, split and index are read from the 'galaxy' section of the input file)")
     parser.add_argument("-o", "--output", default=None, help="Output image for --transit (default: lc.png) or --galaxy (default: galaxy.png)")
@@ -89,6 +91,23 @@ def main():
 
         try:
             GalaxyCNN(cnn_pars).run()  # torch is imported only here
+        except (ValueError, FileNotFoundError) as exc:
+            parser.error(str(exc))
+
+    elif args.dream:
+
+        dream_pars = input_pars.get("dream")
+        if not isinstance(dream_pars, dict):
+            parser.error("input file must contain a 'dream' section")
+        if dream_pars.get("data_root") is None:
+            parser.error("'dream' section is missing: data_root")
+        if not Path(dream_pars["data_root"]).expanduser().is_absolute():
+            parser.error("dream.data_root must be an absolute path")
+
+        from daneel.dream import GalaxyGAN
+
+        try:
+            GalaxyGAN(dream_pars).run()
         except (ValueError, FileNotFoundError) as exc:
             parser.error(str(exc))
 

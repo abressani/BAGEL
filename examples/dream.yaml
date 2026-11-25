@@ -1,0 +1,15 @@
+dream:
+  data_root: /Users/alessandro/Documents/CompAstro/BAGEL/data/      # folder that contains GalaxyMNIST/raw/
+  output_dir: /Users/alessandro/Documents/CompAstro/BAGEL/examples   # figures and report; created if missing
+  split: train
+  epochs: 50
+  batch_size: 64
+  latent_dim: 100
+  base_channels: 64                      # 32 = smaller, faster GAN
+  lr: 0.0002
+  beta1: 0.5
+  seed: 84631
+  grid_size: 4                           # 4 x 4 = 16 generated galaxies
+  augment: true                          # random flips of the real images
+  device: mps                            # cpu, cuda or mps
+  # num_threads: 1                       # CPU threads; leave unset unless your environment is safe with more

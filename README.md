@@ -12,7 +12,7 @@ Documentation: <https://tiziano1590.github.io/comp_astro_26/>.
 ### Prerequisites
 
 - Python >= 3.10
-- PyTorch (`torch`) for the CNN classifier (`-d cnn`)
+- PyTorch (`torch`) for the CNN classifier (`-d cnn`) and the GAN (`--dream`)
 
 ### Install from source
 
@@ -36,6 +36,7 @@ After installation, you can run daneel from the command line:
 daneel -i <input_file> --galaxy [--index N] [--output galaxy.png]
 daneel -i <input_file> -d rf
 daneel -i <input_file> -d cnn
+daneel -i <input_file> --dream
 ```
 
 All the paths are read from the input file, so the command can be run from any
@@ -44,10 +45,10 @@ directory, including one outside the repository.
 ### Command-line options
 
 - `-i, --input`: Input parameter file (required)
-- `-t, --transit`: Generate a transit light curve from the YAML input
 - `-g, --galaxy`: Plot a GalaxyMNIST galaxy and its azimuthally averaged radial brightness profile
 - `-d, --detection {rf,cnn}`: Train and test a classifier on GalaxyMNIST: `rf` = Random Forest, `cnn` = convolutional neural network (PyTorch)
-- `-o, --output`: Output path for the plot (default: `lc.png` for `--transit`, `galaxy.png` for `--galaxy`)
+- `--dream`: Train a generative adversarial network (GAN) on GalaxyMNIST and generate synthetic galaxies
+- `-o, --output`: Output path for the `--galaxy` plot (default: `galaxy.png`)
 - `-a, --atmosphere`: Reserved for the course atmosphere exercise
 - `--index`: Zero-based index of the galaxy to plot with `--galaxy`. It is only used when the `galaxy` section of the input file has no `index`. Valid range: 0–7999 for the train split
 
@@ -62,6 +63,9 @@ daneel -i examples/params.yaml -d rf
 
 # Run the convolutional neural network
 daneel -i examples/params.yaml -d cnn
+
+# Generate synthetic galaxies with a GAN
+daneel -i examples/params.yaml --dream
 ```
 
 ## Galaxy morphology
@@ -122,9 +126,42 @@ All the settings are read from the `cnn` section of the YAML file. The output, i
 daneel sets `KMP_DUPLICATE_LIB_OK=TRUE` before importing PyTorch, which avoids an
 `OMP: Error #15` crash that torch can cause on some macOS conda setups.
 
+### Dreaming new galaxies (GAN)
+
+```bash
+daneel -i path_to_the_parameters.yaml --dream
+```
+
+This trains a generative adversarial network (a DCGAN) on the real GalaxyMNIST images
+and uses it to create new, synthetic galaxy-like RGB images. The generator turns a
+random noise vector into a 64x64 RGB image through four transposed-convolution
+blocks. The discriminator, a stack of strided convolutions, learns to tell real
+images from generated ones, and the two networks are trained against each other
+(binary cross-entropy loss, Adam optimiser, random flips of the real images). The
+model is unconditional: it does not use the galaxy classes.
+
+All the settings are read from the `dream` section of the YAML file. The output, in
+`output_dir`, is:
+
+- `assignment2_taskI_gan.png`: grid of generated galaxies
+- `assignment2_taskI_real.png`: grid of real galaxies, for comparison
+- `report_gan_assignment2_taskI.txt`: training setup, a crude real-vs-generated
+  comparison and the limitations of the synthetic images
+
+Training takes a while on a CPU. For a quick test, use a few `epochs` and
+`base_channels: 32`. The model lives in the reusable module `daneel.dream`:
+
+```python
+from daneel.dream import GalaxyGAN
+
+gan = GalaxyGAN({"data_root": "/absolute/path/to/data", "epochs": 10})
+gan.train(gan.load_images())
+galaxies = gan.generate(16)      # array (16, 64, 64, 3) with values in [0, 1]
+```
+
 ## Input File Format
 
-The input file is a YAML file with one section for each analysis (`transit`, `galaxy`, `random_forest`, `cnn`).
+The input file is a YAML file with one section for each analysis (`galaxy`, `random_forest`, `cnn`, `dream`).
 Each command reads only its own section, so one file can hold several of them.
 
 For the galaxy plot:
@@ -174,6 +211,29 @@ cnn:
 
 Only `data_root` is required. The other keys default to the values above, except
 `output_dir` (current directory) and `evaluate_test` (false).
+
+For the GAN:
+
+```yaml
+dream:
+  data_root: /path/to/data/          # folder containing GalaxyMNIST/raw/ (absolute path)
+  output_dir: /path/to/output        # figures and report; created if missing
+  split: train                       # real images used for training: train or test
+  epochs: 50
+  batch_size: 64
+  latent_dim: 100                    # length of the noise vector
+  base_channels: 64                  # width of both networks (32 = smaller and faster)
+  lr: 0.0002                         # Adam learning rate
+  beta1: 0.5                         # Adam first momentum
+  seed: 84631                        # random seed (weights, batches, noise of the grid)
+  grid_size: 8                       # the figure shows 8 x 8 = 64 galaxies
+  augment: true                      # random flips of the real images
+  device: cpu                        # cpu, cuda or mps
+  # num_threads: 1                 # CPU threads; by default torch's setting is left unchanged
+```
+
+Only `data_root` is required. The output file names can be changed with the optional
+keys `figure`, `real_figure` and `report`.
 
 ## Development
 

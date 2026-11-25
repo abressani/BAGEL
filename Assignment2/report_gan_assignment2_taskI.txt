@@ -1,0 +1,40 @@
+GAN ON GALAXYMNIST (assignment 2, task I)
+============================================================
+Generated: 2026-11-25 12:14:32
+
+TRAINING SETUP
+  Data: 8000 real GalaxyMNIST images (train split), 64x64 RGB, scaled to [-1, 1].
+  Augmentation: random horizontal and vertical flips = True. No class labels are used.
+  Generator (DCGAN, 3576707 parameters): noise vector of length 100 ->
+    4 transposed-convolution blocks (4x4, 8x8, 16x16, 32x32; BatchNorm + ReLU) -> 64x64 RGB (Tanh).
+  Discriminator (2765569 parameters): 4 strided convolutions (64 -> 4 pixels; LeakyReLU 0.2, BatchNorm) -> 1 logit.
+  Base width 64 channels in both networks; weights initialized N(0, 0.02).
+  Loss: binary cross-entropy. The discriminator sees real images with label 0.9 (one-sided label smoothing) and generated images with label 0;
+    the generator is trained to make the discriminator output 1 for its images (non-saturating loss).
+  Optimiser: Adam, lr=0.0002, betas=(0.5, 0.999) for both networks; one update of each network per mini-batch.
+  50 epochs, batch size 64, seed 84631, device mps; training took 29.7 min.
+  Epoch 1: D loss=0.918, G loss=8.996, D(real)=0.80, D(fake)=0.13
+  Last 5 epochs (mean): D loss=0.966, G loss=2.741, D(real)=0.64, D(fake)=0.26
+  Figures: assignment2_taskI_gan.png (generated galaxies, fixed noise from the seed), assignment2_taskI_real.png (real galaxies for comparison).
+
+CRUDE COMPARISON OF 256 REAL AND 256 GENERATED IMAGES
+  Mean R, G, B: real 0.119, 0.110, 0.109 | generated 0.081, 0.076, 0.077
+  Mean pairwise pixel distance (diversity): real 10.29, generated 11.81
+  Mean radial intensity profile at radius 0, 8, 16, 24, 31 pixels:
+    real      0.752, 0.232, 0.106, 0.086, 0.082
+    generated 0.754, 0.210, 0.070, 0.051, 0.048
+
+LIMITATIONS OF THE SYNTHETIC IMAGES
+  - Small, low-resolution training set: 64x64 images (downsampled from 224x224) of a few thousand galaxies,
+    so fine structure such as faint spiral arms, bars and compact companions is lost or invented, and
+    generated images can show blur, checkerboard artifacts or blobs that are not galaxies.
+  - Unconditional model: the classes (round, cigar, edge-on, spiral) cannot be requested, and the class
+    mix of the generated images is unknown and may differ from the real one.
+  - GAN training is unstable and the losses are not a quality measure. Mode collapse (many similar
+    images) or memorization of training images are possible; the diversity number above is only a
+    crude check. No realism metric such as FID is computed; quality is judged by eye.
+  - Not physical: the images are RGB composites without calibrated photometry, noise or point-spread
+    function, so generated galaxies have no measured sizes, colors or masses and must not be used
+    for scientific measurements.
+  - Detailed features (spiral arms, disk thickness) are difficult to reproduce
+  - Single training run and seed; another seed or more epochs can give different samples.
