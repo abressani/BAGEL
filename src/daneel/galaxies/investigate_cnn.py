@@ -12,7 +12,7 @@ What it does:
   4. draw the Grad-CAM map of each chosen galaxy
 
 To run it (settings in the 'explain' section of the YAML file):
-    python -m daneel.galaxies.cnn_explain -i path_to_the_parameters.yaml
+    python -m daneel.galaxies.investigate_cnn -i path_to_the_parameters.yaml
 """
 
 from __future__ import annotations

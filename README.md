@@ -36,6 +36,7 @@ After installation, you can run daneel from the command line:
 daneel -i <input_file> --galaxy [--index N] [--output galaxy.png]
 daneel -i <input_file> -d rf
 daneel -i <input_file> -d cnn
+daneel -i <input_file> --explain
 daneel -i <input_file> --dream
 ```
 
@@ -63,6 +64,9 @@ daneel -i examples/params.yaml -d rf
 
 # Run the convolutional neural network
 daneel -i examples/params.yaml -d cnn
+
+# Run the convolutional neural network explainer
+daneel -i examples/params.yaml --explain
 
 # Generate synthetic galaxies with a GAN
 daneel -i examples/params.yaml --dream
@@ -129,15 +133,13 @@ daneel sets `KMP_DUPLICATE_LIB_OK=TRUE` before importing PyTorch, which avoids a
 ### CNN Explainer
 
 ```bash
-daneel -i path_to_the_parameters.yaml -explain
+daneel -i path_to_the_parameters.yaml --explain
 ```
 This can investigate what the trained Convolutional Neural Network (CNN) has learned using Gradient-weighted Class Activation Mapping (Grad-CAM).
 
 The analysis is performed on the official GalaxyMNIST test set, using a previously saved CNN experiment. The saved model weights, predictions and test images are loaded to reproduce the original experiment.
 
 The tool: identifies correctly classified and misclassified galaxies, saves lists of both groups, including their true and predicted classes and prediction probabilities, selects a specified number of galaxies from each group, computes a Grad-CAM heatmap for each selected galaxy, highlighting the image regions that contribute most to the CNN prediction and overlays the heatmaps on the original RGB images to facilitate morphological interpretation.
-
-
 
 The available selection methods are:
 
@@ -236,6 +238,18 @@ cnn:
 Only `data_root` is required. The other keys default to the values above, except
 `output_dir` (current directory) and `evaluate_test` (false).
 
+For the CNN explainer: 
+```yaml
+explain:
+  results_file: /path/to/cnn_experiment.pt
+  output_dir: /path/to/output
+  selection: random
+  n_per_group: 3
+  selection_seed: 10  #only for random
+  # correct_indices: [ ... ] #only for manual
+  # wrong_indices: [ ... ]   #only for manual
+``` 
+
 For the GAN:
 
 ```yaml
@@ -255,21 +269,9 @@ dream:
   device: cpu                        # cpu, cuda or mps
   # num_threads: 1                 # CPU threads; by default torch's setting is left unchanged
 ```
-
-For the CNN explainer: 
-```yaml
-explain:
-  results_file: /path/to/cnn_experiment.pt
-  output_dir: /path/to/output
-  selection: random
-  n_per_group: 3
-  selection_seed: 10  #only for random
-  # correct_indices: [ ... ] #only for manual
-  # wrong_indices: [ ... ]   #only for manual
-``` 
-
 Only `data_root` is required. The output file names can be changed with the optional
 keys `figure`, `real_figure` and `report`.
+
 
 ## Development
 
